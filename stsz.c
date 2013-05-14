@@ -26,7 +26,8 @@ int quicktime_stsz_init_audio(quicktime_t *file, quicktime_stsz_t *stsz, int sam
 {
 	stsz->sample_size = sample_size;	/* if == 0, then use table */
 	stsz->total_entries = 0;   /* set this when closing */
-	stsz->entries_allocated = 0;
+	stsz->entries_allocated = 1;
+    stsz->table = (quicktime_stsz_table_t*)malloc(sizeof(quicktime_stsz_table_t) * stsz->entries_allocated);
 }
 
 int quicktime_stsz_delete(quicktime_stsz_t *stsz)
@@ -129,6 +130,15 @@ int quicktime_update_stsz(quicktime_stsz_t *stsz, long sample, long sample_size)
 			stsz->table = (quicktime_stsz_table_t *)realloc(stsz->table,
 				sizeof(quicktime_stsz_table_t) * stsz->entries_allocated);
 		}
+
+//         if(sample >= stsz->entries_allocated)
+//         {
+//             stsz->entries_allocated = sample * 2;
+//             new_table = (quicktime_stsz_table_t*)malloc(sizeof(quicktime_stsz_table_t) * stsz->entries_allocated);
+//             for(i = 0; i < stsz->total_entries; i++) new_table[i] = stsz->table[i];
+//             free(stsz->table);
+//             stsz->table = new_table;
+//         }
 
 		stsz->table[sample].size = sample_size;
 		if(sample >= stsz->total_entries) 
