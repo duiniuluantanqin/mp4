@@ -1,6 +1,8 @@
 #ifndef FUNCPROTOS_H
 #define FUNCPROTOS_H
 
+#include "private.h"
+
 /* atom handling routines */
 long quicktime_atom_read_size(char *data);
 u_int64_t quicktime_atom_read_size64(char *data);
@@ -69,7 +71,6 @@ int quicktime_trak_init_audio(quicktime_t *file, quicktime_trak_t *trak, int cha
 int quicktime_trak_init_hint(quicktime_t *file, quicktime_trak_t *trak, quicktime_trak_t *refTrak, int maxPktSize, int time_scale, int sample_duration);
 int quicktime_tref_init(quicktime_tref_t *tref);
 int quicktime_tref_init_hint(quicktime_tref_t *tref, quicktime_trak_t *refTrak);
-int quicktime_udta_init(quicktime_udta_t *udta);
 int quicktime_mvhd_init(quicktime_mvhd_t *mvhd);
 int quicktime_moov_init(quicktime_moov_t *moov);
 int quicktime_mdat_init(quicktime_mdat_t *mdat);
@@ -146,33 +147,17 @@ int quicktime_get_timescale(float frame_rate);
 /* update all the tables after writing a buffer */
 /* set sample_size to 0 if no sample size should be set */
 int quicktime_update_tables(quicktime_t *file, 
-							quicktime_trak_t *trak, 
-							long offset, 
-							long chunk, 
-							long sample, 
-							long samples, 
-							long sample_size,
-							long sample_duration,
-							u_char isSyncSample,
-							long renderingOffset);
+                            quicktime_trak_t *trak, 
+                            long offset, 
+                            long chunk, 
+                            long sample, 
+                            long samples, 
+                            long sample_size,
+                            long sample_duration,
+                            u_char isSyncSample,
+                            long renderingOffset);
 unsigned long quicktime_current_time();
 
-//Add by chenhaibo 2013-04-17-----@_@
-/* Get median duration of video frames for calculating frame rate. */
-int quicktime_sample_duration(quicktime_trak_t *trak);
-
-
-
-//void quicktime_delete_avcc(quicktime_avcc_t *avcc);
-//int quicktime_read_avcc(quicktime_t *file, 
-//                        quicktime_atom_t *parent_atom,
-//                        quicktime_avcc_t *avcc);
-//void quicktime_write_avcc(quicktime_t *file, 
-//                          quicktime_avcc_t *avcc)
-//void quicktime_avcc_dump(quicktime_avcc_t *avcc);
-//void quicktime_set_avcc_header(quicktime_avcc_t *avcc,
-//                               unsigned char *data, 
-//                               int size);
-//-----@_@
-
+/* Returns 1 if equal or 0 if different */
+int quicktime_match_32(char *input, char *output);
 #endif

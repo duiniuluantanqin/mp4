@@ -1,75 +1,68 @@
-/*
- * The contents of this file are subject to the Mozilla Public
- * License Version 1.1 (the "License"); you may not use this file
- * except in compliance with the License. You may obtain a copy of
- * the License at http://www.mozilla.org/MPL/
- * 
- * Software distributed under the License is distributed on an "AS
- * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
- * implied. See the License for the specific language governing
- * rights and limitations under the License.
- * 
- * The Original Code is MPEG4IP.
- * 
- * The Initial Developer of the Original Code is Cisco Systems Inc.
- * Portions created by Cisco Systems Inc. are
- * Copyright (C) Cisco Systems Inc. 2000, 2001.  All Rights Reserved.
- * 
- * Contributor(s): 
- *		Dave Mackie		dmackie@cisco.com
- */
 
+#include "funcprotos.h"
 #include "quicktime.h"
 
 
 int quicktime_tref_init(quicktime_tref_t *tref)
 {
-	quicktime_hint_init(&(tref->hint));
+    quicktime_hint_init(&(tref->hint));
+
+    return 0;
 }
 
 int quicktime_tref_init_hint(quicktime_tref_t *tref, quicktime_trak_t *refTrak)
 {
-	quicktime_hint_set(&(tref->hint), refTrak);
+    quicktime_hint_set(&(tref->hint), refTrak);
+
+    return 0;
 }
 
 int quicktime_tref_delete(quicktime_tref_t *tref)
 {
-	quicktime_hint_delete(&(tref->hint));
+    quicktime_hint_delete(&(tref->hint));
+
+    return 0;
 }
 
 int quicktime_tref_dump(quicktime_tref_t *tref)
 {
-	printf("  tref\n");
-	quicktime_hint_dump(&tref->hint);
+    printf("  tref\n");
+    quicktime_hint_dump(&tref->hint);
+
+    return 0;
 }
 
 int quicktime_read_tref(quicktime_t *file, quicktime_tref_t *tref, quicktime_atom_t *parent_atom)
 {
-	quicktime_atom_t leaf_atom;
+    quicktime_atom_t leaf_atom;
 
-	do {
-		quicktime_atom_read_header(file, &leaf_atom);
+    do {
+        quicktime_atom_read_header(file, &leaf_atom);
 
-		if (quicktime_atom_is(&leaf_atom, "hint")) {
-			quicktime_read_hint(file, &(tref->hint), &leaf_atom);
-		} else {
-			quicktime_atom_skip(file, &leaf_atom);
-		}
-	} while (quicktime_position(file) < parent_atom->end);
+        if (quicktime_atom_is(&leaf_atom, "hint")) {
+            quicktime_read_hint(file, &(tref->hint), &leaf_atom);
+        } else {
+            quicktime_atom_skip(file, &leaf_atom);
+        }
+    } while (quicktime_position(file) < parent_atom->end);
+
+    return 0;
 }
 
 int quicktime_write_tref(quicktime_t *file, quicktime_tref_t *tref)
 {
-	quicktime_atom_t atom;
+    quicktime_atom_t atom;
 
-	if (tref->hint.numTracks == 0) {
-		return;
-	}
+    if (tref->hint.numTracks == 0) {
+        return -1;
+    }
 
-	quicktime_atom_write_header(file, &atom, "tref");
+    quicktime_atom_write_header(file, &atom, "tref");
 
-	quicktime_write_hint(file, &(tref->hint));
+    quicktime_write_hint(file, &(tref->hint));
 
-	quicktime_atom_write_footer(file, &atom);
+    quicktime_atom_write_footer(file, &atom);
+
+    return 0;
 }
 

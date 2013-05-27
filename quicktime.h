@@ -5,14 +5,8 @@
 extern "C" {
 #endif
 
-#include <stdio.h>
-#include <stdlib.h>
-
-#include "win32.h"
 #include "rtphint.h"
 #include "private.h"
-#include "funcprotos.h"
-#include "sizes.h"
 
 
 /* This is the reference for all your library entry points. */
@@ -25,6 +19,8 @@ extern "C" {
 
 /* ===================== compression formats =================== // */
 /* The compression formats are the formats supported natively by Quicktime 4 Linux. */
+
+#define QUICKTIME_H264 "avc1"
 
 #define QUICKTIME_MP4V "mp4v"
 
@@ -79,18 +75,9 @@ int quicktime_check_sig(const char *path);
 /* call this first to open the file and create all the objects */
 quicktime_t *quicktime_open(char *filename, int rd, int wr, int append);
 
-/* make the quicktime file streamable */
-int quicktime_make_streamable(char *in_path, char *out_path);
-
 /* Set various options in the file. */
 int quicktime_set_time_scale(quicktime_t *file, int time_scale);
-int quicktime_set_copyright(quicktime_t *file, char *string);
-int quicktime_set_name(quicktime_t *file, char *string);
-int quicktime_set_info(quicktime_t *file, char *string);
 int quicktime_get_time_scale(quicktime_t *file);
-char *quicktime_get_copyright(quicktime_t *file);
-char *quicktime_get_name(quicktime_t *file);
-char *quicktime_get_info(quicktime_t *file);
 
 /* Read all the information about the file. */
 /* Requires a MOOV atom be present in the file. */
@@ -120,8 +107,6 @@ int quicktime_set_jpeg(quicktime_t *file, int quality, int use_float);
 int quicktime_set_depth(quicktime_t *file, int depth, int track);
 
 /* close the file and delete all the objects */
-int quicktime_write(quicktime_t *file);
-int quicktime_destroy(quicktime_t *file);
 int quicktime_close(quicktime_t *file);
 
 /* get length information */
@@ -286,9 +271,6 @@ int quicktime_encode_audio(quicktime_t *file, QUICKTIME_INT16 **input_i, float *
 /* Dump the file structures for the currently opened file. */
 int quicktime_dump(quicktime_t *file);
 
-/* Specify the number of cpus to utilize. */
-int quicktime_set_cpus(quicktime_t *file, int cpus);
-
 /* Specify whether to read contiguously or not. */
 /* preload is the number of bytes to read ahead. */
 int quicktime_set_preload(quicktime_t *file, long preload);
@@ -296,43 +278,19 @@ int quicktime_set_preload(quicktime_t *file, long preload);
 /* Test the 32 bit overflow */
 int quicktime_test_position(quicktime_t *file);
 
-//Add by chenhaibo 2013-04-17------@_@
-
-/* Frames per second */
-double quicktime_frame_rate(quicktime_t *file, int track);
-/* Frames per second as numerator over denominator*/
-int quicktime_frame_rate_n(quicktime_t *file, int track);
-int quicktime_frame_rate_d(quicktime_t *file, int track);
-
-/* write data for one quicktime track */
-/* the user must handle conversion to the channels in this track */
-/*
- * int quicktime_write_audio(quicktime_t *file, 
- * 	char *audio_buffer, 
- * 	long samples, 
- * 	int track);
- */
-int quicktime_write_frame(quicktime_t *file, 
-							unsigned char *video_buffer, 
-							int64_t bytes, 
-							int track);
-void quicktime_write_chunk_header(quicktime_t *file, 
-								  quicktime_trak_t *trak, 
-								  quicktime_atom_t *chunk);
-void quicktime_write_chunk_footer(quicktime_t *file, 
-								  quicktime_trak_t *trak,
-								  int current_chunk,
-								  quicktime_atom_t *chunk, 
-								  int samples);
+/* Get median duration of video frames for calculating frame rate. */
+int quicktime_sample_duration(quicktime_trak_t *trak);
 
 void quicktime_get_avcc_header(quicktime_avcc_t *avcc,
-                               unsigned char **data, 
+                               unsigned char *data, 
                                int *size);
 void quicktime_set_avcc_header(quicktime_avcc_t *avcc,
                                unsigned char *data, 
                                int size);
 
-//------@_@
+int quicktime_has_keyframes(quicktime_t *file, int track);
+int quicktime_h264_is_key(unsigned char *data, long size, char *codec_id);
+
 
 #ifdef __cplusplus
 }
